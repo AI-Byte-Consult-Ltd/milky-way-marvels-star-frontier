@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Milky Way Marvels — Star Frontier</title>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --bg-void:#0a0d16;
+  --bg-void2:#0d1120;
+  --bg-panel:#121826;
+  --bg-panel2:#161f31;
+  --bg-raised:#1b2436;
+  --line:#28324a;
+  --line-soft:#1e2738;
+  --brass:#c98a4b;
+  --brass-dim:#8a613a;
+  --cyan:#5fd4c4;
+  --cyan-dim:#2f6b63;
+  --text:#e9edf6;
+  --text-dim:#8792a8;
+  --text-faint:#5a6478;
+  --danger:#e0616f;
+  --good:#6fd67f;
+  --gold:#e8b64f;
+  --metal:#c96a3b;
+  --ice:#8fd3ee;
+  --crystal:#c98fef;
+  --organics:#7fd68f;
+  --font-display:'Space Grotesk', system-ui, sans-serif;
+  --font-mono:'IBM Plex Mono', monospace;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.5) 0, transparent 60%),
+    radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,.35) 0, transparent 60%),
+    radial-gradient(1.5px 1.5px at 40% 80%, rgba(255,255,255,.4) 0, transparent 60%),
+    radial-gradient(1px 1px at 85% 15%, rgba(255,255,255,.3) 0, transparent 60%),
+    radial-gradient(1px 1px at 55% 45%, rgba(255,255,255,.25) 0, transparent 60%),
+    radial-gradient(1px 1px at 10% 70%, rgba(255,255,255,.3) 0, transparent 60%),
+    radial-gradient(1px 1px at 92% 80%, rgba(255,255,255,.3) 0, transparent 60%),
+    radial-gradient(ellipse at 50% 0%, #10162a 0%, var(--bg-void) 55%, var(--bg-void2) 100%);
+  background-attachment:fixed;
+  color:var(--text);
+  font-family:var(--font-display);
+  min-height:100vh;
+}
+
+button{font-family:var(--font-display);cursor:pointer;}
+::selection{background:var(--cyan);color:#00201c;}
+
+#app{display:flex;flex-direction:column;min-height:100vh;}
+
+/* ---------- TOPBAR ---------- */
+#topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 22px;border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(18,24,38,.9), rgba(18,24,38,.55));
+  backdrop-filter:blur(6px);
+  position:sticky;top:0;z-index:20;
+  gap:12px;flex-wrap:wrap;
+}
+.brand{display:flex;align-items:baseline;gap:10px;}
+.brand .icon{font-size:22px;}
+.brand span{font-weight:700;letter-spacing:.06em;font-size:16px;}
+.brand small{color:var(--text-dim);font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;}
+#topbar-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.btn{
+  background:var(--bg-raised);border:1px solid var(--line);color:var(--text);
+  padding:8px 13px;border-radius:7px;font-size:12.5px;font-weight:600;letter-spacing:.02em;
+  display:inline-flex;align-items:center;gap:6px;transition:all .15s ease;
+}
+.btn:hover{border-color:var(--cyan-dim);background:#202c44;transform:translateY(-1px);}
+.btn:active{transform:translateY(0);}
+.btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}
+.btn-primary{background:linear-gradient(180deg,#2a7f74,#1c5952);border-color:#2f8a7d;color:#e9fffb;}
+.btn-primary:hover{background:linear-gradient(180deg,#33988b,#20675f);}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none;filter:grayscale(.4);}
+.btn-brass{background:linear-gradient(180deg,#a9723f,#7a5029);border-color:var(--brass);color:#fff3e4;}
+.btn-brass:hover{background:linear-gradient(180deg,#bd8248,#8a5d31);}
+.btn-brass:disabled{opacity:.4;cursor:not-allowed;transform:none;filter:grayscale(.4);}
+.btn-ghost{background:transparent;}
+.btn-danger{border-color:#6b2b33;}
+.btn-danger:hover{border-color:var(--danger);background:#301419;}
+.btn-sm{padding:5px 9px;font-size:11px;border-radius:6px;}
+
+/* ---------- GRID ---------- */
+#gamegrid{
+  display:grid;grid-template-columns:300px 1fr;gap:18px;
+  padding:18px 22px 40px;flex:1;
+  max-width:1320px;margin:0 auto;width:100%;
+}
+
+/* ---------- LEFT PANEL ---------- */
+#leftPanel{display:flex;flex-direction:column;gap:12px;min-width:0;}
+.panel-block{
+  background:linear-gradient(180deg, var(--bg-panel2), var(--bg-panel));
+  border:1px solid var(--line);border-radius:12px;padding:14px;
+  position:relative;overflow:hidden;
+}
+.panel-block::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg, transparent, var(--brass-dim), transparent);opacity:.6;
+}
+.block-label{
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--text-dim);margin-bottom:9px;display:flex;justify-content:space-between;align-items:center;
+}
+
+.rank-title{font-weight:700;font-size:14px;letter-spacing:.03em;margin-bottom:9px;}
+.rank-title .rname{color:var(--brass);}
+.bar-outer{height:9px;border-radius:5px;background:#0c1120;border:1px solid var(--line);overflow:hidden;}
+.bar-inner{height:100%;border-radius:5px;transition:width .4s ease;}
+.xp-bar .bar-inner{background:linear-gradient(90deg,var(--brass-dim),var(--brass));}
+.fuel-bar .bar-inner{background:linear-gradient(90deg,#2f6b63,var(--cyan));}
+.mission-bar .bar-inner{background:linear-gradient(90deg,#3a6b3f,var(--good));}
+.bar-label{font-family:var(--font-mono);font-size:10.5px;color:var(--text-dim);margin-top:6px;display:flex;justify-content:space-between;}
+
+.credits-value{font-size:26px;font-weight:700;color:var(--gold);font-family:var(--font-mono);}
+.credits-sub{font-family:var(--font-mono);font-size:10.5px;color:var(--text-dim);margin-top:2px;}
+
+.element-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.el-chip{
+  display:flex;align-items:center;gap:7px;background:#0d1220;border:1px solid var(--line-soft);
+  border-radius:7px;padding:6px 8px;font-family:var(--font-mono);font-size:11.5px;
+}
+.el-dot{width:9px;height:9px;border-radius:50%;flex:none;box-shadow:0 0 6px currentColor;}
+.el-sym{color:var(--text-dim);flex:1;}
+.el-amt{font-weight:600;color:var(--text);}
+
+.mini-btn-row{display:flex;gap:6px;margin-top:9px;}
+.mini-btn-row .btn{flex:1;justify-content:center;}
+
+#missionDesc{font-size:12.5px;line-height:1.5;color:var(--text);margin-bottom:9px;min-height:36px;}
+#missionCycleTag{color:var(--text-faint);font-family:var(--font-mono);font-size:10px;}
+
+.colonies-summary{font-family:var(--font-mono);font-size:11.5px;color:var(--text-dim);display:flex;flex-direction:column;gap:4px;}
+.colonies-summary b{color:var(--text);}
+
+/* ---------- MAP PANEL ---------- */
+#mapPanel{display:flex;flex-direction:column;gap:0;min-width:0;}
+#mapWrap{
+  position:relative;border:1px solid var(--line);border-radius:12px;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 45%, #0f1526 0%, #090c15 70%);
+}
+#starmap{width:100%;height:480px;display:block;touch-action:manipulation;}
+.map-hint{
+  position:absolute;top:10px;left:12px;font-family:var(--font-mono);font-size:10px;color:var(--text-faint);
+  letter-spacing:.06em;pointer-events:none;
+}
+.map-node-tip{
+  position:absolute;pointer-events:none;background:#0d1220;border:1px solid var(--line);
+  border-radius:6px;padding:5px 9px;font-size:11px;font-family:var(--font-mono);
+  transform:translate(-50%,-130%);white-space:nowrap;opacity:0;transition:opacity .12s ease;z-index:5;
+}
+
+#dockPanel{
+  border:1px solid var(--line);border-top:none;border-radius:0 0 12px 12px;
+  background:linear-gradient(180deg, var(--bg-panel2), var(--bg-panel));
+  padding:16px 18px;display:flex;flex-direction:column;gap:12px;
+}
+#dockTop{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;}
+#dockSystemName{font-size:18px;font-weight:700;letter-spacing:.02em;}
+#dockSystemDesc{color:var(--text-dim);font-size:12.5px;margin-top:3px;max-width:520px;line-height:1.45;}
+#dockCompletion{font-family:var(--font-mono);font-size:11px;color:var(--cyan);white-space:nowrap;}
+
+#dockPlanetsList{display:flex;flex-direction:column;gap:8px;}
+.planet-card{
+  display:flex;align-items:center;gap:12px;background:#0d1220;border:1px solid var(--line-soft);
+  border-radius:10px;padding:9px 12px;flex-wrap:wrap;
+}
+.planet-info{flex:1;min-width:160px;}
+.planet-name{font-weight:600;font-size:13px;}
+.planet-meta{font-family:var(--font-mono);font-size:10.5px;color:var(--text-dim);margin-top:2px;}
+.planet-status{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;margin-top:4px;padding:2px 7px;border-radius:20px;display:inline-block;}
+.st-available{color:var(--cyan);background:#0f2b28;border:1px solid #1f5850;}
+.st-owned{color:var(--gold);background:#2c220f;border:1px solid #5a4520;}
+.st-contested{color:var(--danger);background:#2b1315;border:1px solid #5a2429;}
+.st-homeworld{color:var(--gold);background:#2c220f;border:1px solid #5a4520;}
+.planet-actions{display:flex;flex-direction:column;gap:5px;align-items:flex-end;}
+.def-tag{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);}
+
+/* ---------- CARDS (planet glyphs) ---------- */
+.glyph-canvas{display:block;border-radius:50%;}
+.glyph-wrap{position:relative;display:flex;align-items:center;justify-content:center;flex:none;}
+
+.rarity-badge{
+  font-family:var(--font-mono);font-size:9.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+  padding:2px 8px;border-radius:20px;display:inline-block;
+}
+
+/* ---------- TOASTS ---------- */
+#toastContainer{position:fixed;bottom:18px;right:18px;display:flex;flex-direction:column;gap:8px;z-index:100;max-width:340px;}
+.toast{
+  background:#111827;border:1px solid var(--line);border-left:3px solid var(--cyan);
+  padding:11px 14px;border-radius:8px;font-size:12.5px;box-shadow:0 8px 24px rgba(0,0,0,.4);
+  animation:toastIn .25s ease;
+}
+.toast.err{border-left-color:var(--danger);}
+.toast.ok{border-left-color:var(--good);}
+.toast.fadeout{animation:toastOut .35s ease forwards;}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
+@keyframes toastOut{to{opacity:0;transform:translateX(20px);}}
+
+/* ---------- MODALS ---------- */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(6,8,14,.78);backdrop-filter:blur(3px);
+  display:flex;align-items:center;justify-content:center;z-index:200;padding:20px;
+}
+.modal-overlay.hidden{display:none;}
+.modal-card{
+  background:linear-gradient(180deg,#151d30,#0f1524);border:1px solid var(--line);
+  border-radius:16px;max-width:640px;width:100%;max-height:88vh;overflow:auto;
+  padding:24px;position:relative;
+}
+.modal-close{
+  position:absolute;top:14px;right:14px;background:var(--bg-raised);border:1px solid var(--line);
+  color:var(--text);width:30px;height:30px;border-radius:50%;font-size:15px;line-height:1;
+}
+.modal-close:hover{border-color:var(--danger);}
+
+/* atlas modal */
+.coll-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:6px;}
+.coll-title{font-size:18px;font-weight:700;}
+.coll-sub{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 16px;}
+.filter-chip{
+  font-family:var(--font-mono);font-size:10.5px;padding:5px 11px;border-radius:20px;border:1px solid var(--line);
+  background:#0d1220;color:var(--text-dim);
+}
+.filter-chip.active{color:#fff;border-color:var(--cyan);background:#12362f;}
+.sys-group{margin-bottom:18px;}
+.sys-group-title{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--brass);border-bottom:1px solid var(--line-soft);padding-bottom:5px;margin-bottom:10px;
+  display:flex;justify-content:space-between;
+}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px;}
+.obj-card{
+  background:#0d1220;border:1px solid var(--line-soft);border-radius:10px;padding:9px;
+  display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;
+}
+.obj-card.locked{opacity:.45;}
+.obj-card .name{font-size:11px;font-weight:600;line-height:1.2;}
+.obj-card .count{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);}
+.locked-icon{width:56px;height:56px;border-radius:50%;background:#131a2b;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;color:var(--text-faint);font-size:20px;}
+
+/* market modal */
+.market-row{
+  display:flex;align-items:center;gap:12px;padding:10px 6px;border-bottom:1px solid var(--line-soft);flex-wrap:wrap;
+}
+.market-row:last-child{border-bottom:none;}
+.market-info{flex:1;min-width:140px;}
+.market-name{font-weight:600;font-size:13px;}
+.market-stock{font-family:var(--font-mono);font-size:11px;color:var(--text-dim);margin-top:2px;}
+.market-actions{display:flex;gap:6px;}
+
+/* help modal */
+.help-card h2{margin-top:0;font-size:19px;}
+.help-card p, .help-card li{font-size:13px;line-height:1.6;color:var(--text-dim);}
+.help-card strong{color:var(--text);}
+.help-card ul{padding-left:18px;}
+.help-disclaimer{margin-top:16px;padding:10px 12px;border:1px solid var(--line-soft);border-radius:8px;font-size:11.5px;color:var(--text-faint);}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:900px){
+  #gamegrid{grid-template-columns:1fr;padding:14px;}
+  #mapPanel{order:1;}
+  #leftPanel{order:2;flex-direction:column;}
+  #starmap{height:360px;}
+  .brand span{font-size:14px;}
+  #topbar{padding:12px 14px;}
+}
+@media (max-width:480px){
+  .btn{padding:7px 10px;font-size:11.5px;}
+  .modal-card{padding:18px;}
+  .planet-card{flex-direction:column;align-items:flex-start;}
+  .planet-actions{align-items:flex-start;flex-direction:row;}
+}
+
+.hidden{display:none!important;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header id="topbar">
+    <div class="brand">
+      <span class="icon">🛰️</span>
+      <span>MILKY WAY MARVELS</span>
+      <small>Star&nbsp;Frontier</small>
+    </div>
+    <div id="topbar-actions">
+      <button class="btn btn-brass" id="walletBtn">🔗 Connect Wallet</button>
+      <button class="btn btn-ghost" id="helpBtn">❔ How to Play</button>
+      <button class="btn" id="atlasBtn">🌌 Star Atlas <span id="atlasCount" class="credits-sub"></span></button>
+      <button class="btn" id="marketBtn">💱 Market</button>
+      <button class="btn btn-ghost" id="muteBtn">🔊</button>
+      <button class="btn btn-ghost btn-danger" id="resetBtn">⟲ Reset</button>
+    </div>
+  </header>
+
+  <main id="gamegrid">
+
+    <aside id="leftPanel">
+      <div class="panel-block" id="rankBlock">
+        <div class="rank-title">⭐ <span class="rname" id="rankName">Ensign</span></div>
+        <div class="bar-outer xp-bar"><div class="bar-inner" id="xpBar" style="width:0%"></div></div>
+        <div class="bar-label"><span id="xpLabel">0 / 100 XP</span><span id="lvlLabel">Lv. 1</span></div>
+      </div>
+
+      <div class="panel-block">
+        <div class="block-label">⛽ FUEL</div>
+        <div class="bar-outer fuel-bar"><div class="bar-inner" id="fuelBar" style="width:100%"></div></div>
+        <div class="bar-label"><span id="fuelLabel">40 / 40</span><span>+1 / 20s</span></div>
+        <div class="mini-btn-row">
+          <button class="btn btn-primary btn-sm" id="buyFuelBtn">Buy +10 Fuel (12cr)</button>
+        </div>
+      </div>
+
+      <div class="panel-block">
+        <div class="block-label">💰 STAR CREDITS</div>
+        <div class="credits-value" id="creditsValue">150</div>
+        <div class="credits-sub">Earned from colonies &amp; trading — open the Market to buy or sell.</div>
+      </div>
+
+      <div class="panel-block">
+        <div class="block-label">🧪 MATERIALS</div>
+        <div class="element-grid" id="elementGrid"></div>
+      </div>
+
+      <div class="panel-block">
+        <div class="block-label">🏳️ COLONIES</div>
+        <div class="colonies-summary" id="coloniesSummary"></div>
+      </div>
+
+      <div class="panel-block">
+        <div class="block-label">📜 CAPTAIN'S LOG <span id="missionCycleTag"></span></div>
+        <div id="missionDesc">Loading...</div>
+        <div class="bar-outer mission-bar"><div class="bar-inner" id="missionBar" style="width:0%"></div></div>
+      </div>
+    </aside>
+
+    <section id="mapPanel">
+      <div id="mapWrap">
+        <canvas id="starmap"></canvas>
+        <div class="map-hint">DEEP SPACE CHART — CLICK A STAR TO SET COURSE</div>
+        <div class="map-node-tip" id="mapTip"></div>
+      </div>
+      <div id="dockPanel">
+        <div id="dockTop">
+          <div>
+            <div id="dockSystemName">—</div>
+            <div id="dockSystemDesc">—</div>
+          </div>
+          <div id="dockCompletion">0 / 0 colonized</div>
+        </div>
+        <div id="dockPlanetsList"></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div id="toastContainer"></div>
+
+<div class="modal-overlay hidden" id="atlasModal">
+  <div class="modal-card" style="max-width:920px;">
+    <button class="modal-close" id="atlasModalClose">✕</button>
+    <div class="coll-head">
+      <div>
+        <div class="coll-title">Star Atlas</div>
+        <div class="coll-sub" id="atlasSub">0 / 0 planets surveyed</div>
+      </div>
+    </div>
+    <div class="filter-row" id="filterRow"></div>
+    <div id="atlasBody"></div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="marketModal">
+  <div class="modal-card" style="max-width:560px;">
+    <button class="modal-close" id="marketModalClose">✕</button>
+    <div class="coll-title">Trade Market</div>
+    <div class="coll-sub">Buy fuel and materials, or sell your surplus for Star Credits.</div>
+    <div id="marketBody" style="margin-top:12px;"></div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="walletModal">
+  <div class="modal-card" style="max-width:560px;">
+    <button class="modal-close" id="walletModalClose">✕</button>
+    <div class="coll-title">On-Chain Wallet</div>
+    <div class="coll-sub">Read-only check on Cronos — no transaction or signature is ever requested.</div>
+    <div id="walletBody" style="margin-top:14px;"></div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="helpModal">
+  <div class="modal-card help-card">
+    <button class="modal-close" id="helpModalClose">✕</button>
+    <h2>🛰️ How to Play</h2>
+    <ul>
+      <li>The <strong>chart</strong> in the center shows the known galaxy. Click any star to set course and fly there.</li>
+      <li><strong>Fuel</strong> is spent on every flight, based on distance. It regenerates slowly on its own, or you can buy it instantly with <strong>Star Credits</strong> from the sidebar or the Market.</li>
+      <li>Arriving at a new star automatically <strong>surveys</strong> its planets, granting a one-time haul of that planet's material (Metal, Ice, Crystal, or Organics).</li>
+      <li>Any surveyed planet can be <strong>colonized</strong> using Credits + Metal. Colonies produce a steady trickle of materials and Credits over time — your main source of long-term income.</li>
+      <li>Colonies can be <strong>raided</strong> by rival factions. Undefended colonies are more likely to fall — invest in their <strong>Defense Grid</strong> to protect them. Even unclaimed surveyed planets can be snapped up by rivals if you wait too long.</li>
+      <li>Lost or rival-held planets show as <strong>Contested</strong> — you can <strong>reclaim</strong> them, at a premium.</li>
+      <li>Sell surplus materials at the <strong>Market</strong> for Credits, and reinvest in fuel, colonies, and defenses.</li>
+      <li><strong>Connect Wallet</strong> (top right) lets holders of the real Milky Way Marvels NFT collection or RaVerse token on Cronos claim a one-time Founder's Credit bonus. This only reads your public on-chain balances — no transaction or signature is ever requested.</li>
+      <li>Your progress saves automatically in this browser.</li>
+    </ul>
+    <div class="help-disclaimer">Milky Way Marvels: Star Frontier is a companion game for the Milky Way Marvels NFT collection and the RaVerse token on Cronos. Connecting a wallet only checks public on-chain balances (read-only) to grant a cosmetic bonus — it never requests a transaction, a signature, or your private key, and no in-game currency here has real-world value.</div>
+    <button class="btn btn-primary" style="margin-top:16px;" id="helpCloseBtn">Understood, launch the fleet</button>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   UTILITIES
+============================================================ */
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function hashStr(str){
+  let h = 2166136261;
+  for(let i=0;i<str.length;i++){ h ^= str.charCodeAt(i); h = Math.imul(h,16777619); }
+  return h >>> 0;
+}
+function slug(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,''); }
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+function debounce(fn,ms){ let t; return function(...a){ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; }
+function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstChild; }
+
+/* ============================================================
+   GAME DATA — GALAXY GENERATION
+============================================================ */
+const RESOURCE_DEFS = {
+  metal:   {name:'Metal',    symbol:'Fe', color:'#c96a3b'},
+  ice:     {name:'Ice',      symbol:'Ice',color:'#8fd3ee'},
+  crystal: {name:'Crystal',  symbol:'Cr', color:'#c98fef'},
+  organics:{name:'Organics', symbol:'Or', color:'#7fd68f'}
+};
+const RESOURCE_IDS = Object.keys(RESOURCE_DEFS);
+
+const PLANET_FLAVORS = {
+  metal:   ['Iron-Core World','Rocky Mining World','Ore-Rich Planetoid','Ferrous Wasteland'],
+  ice:     ['Frozen Moon','Glacial World','Cryo World','Ice-Capped Planet'],
+  crystal: ['Crystalline Cavern World','Prismatic Asteroid Belt','Geode World','Quartz Wasteland'],
+  organics:['Verdant Garden World','Bio-Luminous Jungle','Fungal Marsh World','Living Ocean World']
+};
+
+const STAR_DESCS = [
+  'A quiet system on the frontier.',
+  'Charted decades ago but rarely visited.',
+  'A binary system with unstable tides.',
+  'Once a waypoint for early colonists.',
+  'Surrounded by faint nebular dust.',
+  'A system rich in mineral deposits.',
+  'Home to a young, energetic star.',
+  'An ancient system near the galactic drift.',
+  'Notably calm — ideal for expansion.',
+  'A contested corridor — keep your guard up.'
+];
+
+const FACTIONS = ['the Void Corsairs','the Ashen Combine','the Drift Cartel','the Kessler Syndicate','Rogue Prospectors','the Hollow Fleet'];
+
+const STAR_NAMES = [
+  'Sol','Alpha Centauri','Proxima Centauri','Sirius','Vega','Altair','Rigel','Betelgeuse',
+  'Tau Ceti','Wolf 359',"Barnard's Star",'Kepler-186','Trappist-1','Gliese 581','61 Cygni',
+  'Epsilon Eridani','Fomalhaut','Arcturus','Capella','Procyon','Aldebaran','Antares','Deneb',
+  'Polaris','Regulus','Spica'
+];
+
+function pickResourceType(rand){
+  const r = rand()*100;
+  if(r<35) return 'metal';
+  if(r<65) return 'ice';
+  if(r<85) return 'organics';
+  return 'crystal';
+}
+function pickFrom(arr, rand){ return arr[Math.floor(rand()*arr.length)]; }
+
+const STAR_INDEX = {};
+const PLANET_INDEX = {};
+const STAR_ORDER = [];
+
+STAR_NAMES.forEach((name, si)=>{
+  const id = slug(name);
+  const isHome = id==='sol';
+  const rand = mulberry32(hashStr(id+'::planets'));
+  const descRand = mulberry32(hashStr(id+'::desc'));
+  const planets = [];
+  const numerals = ['I','II','III','IV'];
+
+  if(isHome){
+    planets.push({
+      id:id+'_p0', starId:id, name:name+' I — Homeworld',
+      resourceType:'metal', richness:1.2,
+      flavor:'Fortified Homeworld', homeworld:true
+    });
+    const rt = pickResourceType(rand);
+    planets.push({
+      id:id+'_p1', starId:id, name:name+' II',
+      resourceType:rt, richness:+(0.6+rand()*1.4).toFixed(2),
+      flavor:pickFrom(PLANET_FLAVORS[rt], rand)
+    });
+  }else{
+    const roll = rand();
+    const count = roll<0.3 ? 1 : (roll<0.75 ? 2 : 3);
+    for(let i=0;i<count;i++){
+      const rt = pickResourceType(rand);
+      planets.push({
+        id:id+'_p'+i, starId:id, name:`${name} ${numerals[i]}`,
+        resourceType:rt, richness:+(0.6+rand()*1.4).toFixed(2),
+        flavor:pickFrom(PLANET_FLAVORS[rt], rand)
+      });
+    }
+  }
+
+  planets.forEach(p=>{ PLANET_INDEX[p.id]=p; });
+  const desc = isHome ? "Home system. Protected by the Captain's home fleet — always safe." : pickFrom(STAR_DESCS, descRand);
+  STAR_INDEX[id] = { id, name, desc, homeworld:isHome, planets };
+  STAR_ORDER.push(id);
+});
+
+const TOTAL_PLANETS = Object.keys(PLANET_INDEX).length;
+const HOME_STAR_ID = 'sol';
+const HOME_PLANET_ID = 'sol_p0';
+
+/* ---------- galaxy layout (deterministic scatter) ---------- */
+const STAR_POS = {};
+(function generateLayout(){
+  const rand = mulberry32(hashStr('galaxy-layout-v1'));
+  STAR_POS[HOME_STAR_ID] = {nx:0.5, ny:0.46};
+  STAR_ORDER.filter(id=>id!==HOME_STAR_ID).forEach(id=>{
+    let best=null, bestScore=-1;
+    for(let attempt=0; attempt<40; attempt++){
+      const nx = 0.08+rand()*0.84, ny = 0.08+rand()*0.84;
+      let minD = Infinity;
+      Object.values(STAR_POS).forEach(p=>{ const d=Math.hypot(p.nx-nx,p.ny-ny); if(d<minD) minD=d; });
+      if(minD>bestScore){ bestScore=minD; best={nx,ny}; }
+      if(minD>0.16) break;
+    }
+    STAR_POS[id]=best;
+  });
+})();
+
+function starDistanceNorm(aId,bId){
+  const a=STAR_POS[aId], b=STAR_POS[bId];
+  return Math.hypot(a.nx-b.nx, a.ny-b.ny);
+}
+
+const NEIGHBOR_LINES = (function(){
+  const edges = new Set();
+  STAR_ORDER.forEach(id=>{
+    const dists = STAR_ORDER.filter(o=>o!==id).map(o=>({o,d:starDistanceNorm(id,o)})).sort((a,b)=>a.d-b.d).slice(0,2);
+    dists.forEach(x=>{ const key=[id,x.o].sort().join('|'); edges.add(key); });
+  });
+  return Array.from(edges).map(k=>k.split('|'));
+})();
+
+/* ============================================================
+   MARKET RATES
+============================================================ */
+const MARKET_RATES = {
+  metal:   {buy:3,   sell:1.5},
+  ice:     {buy:2.5, sell:1.2},
+  organics:{buy:6,   sell:3},
+  crystal: {buy:9,   sell:5}
+};
+const FUEL_BUY_RATE = 1.2; // credits per unit
+
+/* ============================================================
+   MISSIONS
+============================================================ */
+const MISSION_QUEUE = [
+  {desc:'Fly to your first neighboring star.', type:'visitedCount', target:2, reward:{fuel:10}},
+  {desc:'Survey 3 star systems.', type:'visitedCount', target:3, reward:{credits:20}},
+  {desc:'Establish your first colony.', type:'coloniesCount', target:1, reward:{fuel:15}},
+  {desc:'Accumulate 100 Star Credits.', type:'credits', target:100, reward:{xp:40}},
+  {desc:'Colonize 3 planets.', type:'coloniesCount', target:3, reward:{elements:{metal:15}}},
+  {desc:'Upgrade a colony\u2019s Defense Grid to level 2.', type:'maxDefense', target:2, reward:{fuel:20}},
+  {desc:'Sell resources at the Market.', type:'marketSales', target:1, reward:{credits:15}},
+  {desc:'Reach Captain Level 3.', type:'level', target:3, reward:{elements:{ice:10}}},
+  {desc:'Survive your first raid.', type:'raidsSurvived', target:1, reward:{fuel:25}},
+  {desc:'Colonize 5 planets.', type:'coloniesCount', target:5, reward:{credits:60}},
+  {desc:'Accumulate 500 Star Credits.', type:'credits', target:500, reward:{xp:80}},
+  {desc:'Visit 10 star systems.', type:'visitedCount', target:10, reward:{elements:{crystal:8}}},
+  {desc:'Reach Captain Level 5.', type:'level', target:5, reward:{fuel:35}},
+  {desc:'Colonize 10 planets.', type:'coloniesCount', target:10, reward:{credits:100}},
+  {desc:'Upgrade a colony\u2019s Defense Grid to level 4.', type:'maxDefense', target:4, reward:{elements:{metal:25}}},
+  {desc:'Visit 18 star systems.', type:'visitedCount', target:18, reward:{credits:120}},
+  {desc:'Accumulate 1500 Star Credits.', type:'credits', target:1500, reward:{xp:150}},
+  {desc:'Colonize 15 planets.', type:'coloniesCount', target:15, reward:{elements:{organics:20,crystal:10}}},
+  {desc:'Reclaim a lost colony.', type:'reclaims', target:1, reward:{credits:80}},
+  {desc:'Colonize half the known galaxy.', type:'coloniesCount', target:Math.max(2,Math.ceil((TOTAL_PLANETS-1)/2)), reward:{elements:{metal:50,ice:50,crystal:50,organics:50}}}
+];
+const RANKS = ['Ensign','Pilot','Navigator','Commander','Captain','Commodore','Admiral'];
+const STORAGE_KEY = 'mwm-frontier-save-v1';
+
+/* ============================================================
+   STATE
+============================================================ */
+function defaultState(){
+  const materials = {};
+  RESOURCE_IDS.forEach(id=>materials[id]=0);
+  const planetState = {};
+  planetState[HOME_PLANET_ID] = {visited:true, status:'colonized', owner:'player', defenseLevel:99, homeworld:true, rivalFaction:null};
+  return {
+    level:1, xp:0,
+    fuel:40, fuelMax:40,
+    credits:150,
+    materials,
+    planetState,
+    visitedStars:[HOME_STAR_ID],
+    currentStar:HOME_STAR_ID,
+    missionsCompleted:0,
+    marketSales:0,
+    raidsSurvived:0,
+    reclaimsCount:0,
+    muted:false,
+    seenIntro:false,
+    walletAddress:null,
+    marvelCount:0,
+    marvelTokens:[],
+    raverseBalance:0,
+    walletBonusClaimedFor:null
+  };
+}
+let state = defaultState();
+
+function getPlanetState(id){
+  if(!state.planetState[id]) state.planetState[id] = {visited:false, status:'unclaimed', owner:null, defenseLevel:0, rivalFaction:null};
+  return state.planetState[id];
+}
+function countPlayerColonies(){
+  return Object.values(state.planetState).filter(ps=>ps.owner==='player' && !ps.homeworld).length;
+}
+
+async function loadGame(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ /* no save yet, or storage blocked */ }
+  return null;
+}
+let saveTimer=null;
+function persist(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }catch(e){ console.error('save failed', e); }
+  }, 400);
+}
+
+/* ============================================================
+   AUDIO
+============================================================ */
+let actx=null;
+function ac(){ if(!actx){ try{ actx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } return actx; }
+function beep(freq,dur,type,gainVal,delay){
+  if(state.muted) return;
+  const a = ac(); if(!a) return;
+  try{
+    const t0 = a.currentTime + (delay||0);
+    const osc = a.createOscillator(); const gain = a.createGain();
+    osc.type = type||'sine'; osc.frequency.setValueAtTime(freq,t0);
+    gain.gain.setValueAtTime(0,t0);
+    gain.gain.linearRampToValueAtTime(gainVal||0.06,t0+0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    osc.connect(gain); gain.connect(a.destination);
+    osc.start(t0); osc.stop(t0+dur+0.02);
+  }catch(e){}
+}
+function sfxTravel(){ beep(320,0.12,'square',0.05); beep(460,0.10,'square',0.04,0.08); }
+function sfxGood(){ beep(440,0.16,'triangle',0.07); beep(660,0.18,'triangle',0.06,0.09); }
+function sfxLevelUp(){ [0,1,2].forEach(i=>beep(440+i*160,0.16,'triangle',0.07,i*0.1)); }
+function sfxError(){ beep(140,0.18,'sawtooth',0.05); }
+function sfxClick(){ beep(600,0.05,'square',0.03); }
+function sfxRaidLoss(){ beep(180,0.22,'sawtooth',0.06); beep(120,0.28,'sawtooth',0.05,0.12); }
+
+/* ============================================================
+   DERIVED HELPERS
+============================================================ */
+function xpToNext(level){ return 100 + (level-1)*40; }
+function rankName(level){
+  const i = clamp(level-1,0,RANKS.length-1);
+  return level>RANKS.length ? `${RANKS[RANKS.length-1]} Lv.${level}` : RANKS[i];
+}
+function gainXP(n){
+  state.xp += n;
+  while(state.xp >= xpToNext(state.level)){
+    state.xp -= xpToNext(state.level);
+    state.level++;
+    state.fuelMax += 5;
+    state.fuel = state.fuelMax;
+    toast(`⭐ Captain promoted: Level ${state.level} (${rankName(state.level)})`, 'ok');
+    sfxLevelUp();
+  }
+}
+function applyRewardObj(reward){
+  if(!reward) return;
+  if(reward.fuel) state.fuel = Math.min(state.fuelMax, state.fuel + reward.fuel);
+  if(reward.credits) state.credits += reward.credits;
+  if(reward.xp) gainXP(reward.xp);
+  if(reward.elements){
+    Object.entries(reward.elements).forEach(([k,v])=>{ state.materials[k] = (state.materials[k]||0) + v; });
+  }
+}
+function rewardText(reward){
+  const parts=[];
+  if(reward.fuel) parts.push(`+${reward.fuel}⛽`);
+  if(reward.credits) parts.push(`+${reward.credits}cr`);
+  if(reward.xp) parts.push(`+${reward.xp}XP`);
+  if(reward.elements) Object.entries(reward.elements).forEach(([k,v])=>parts.push(`+${v}${RESOURCE_DEFS[k].symbol}`));
+  return parts.join('  ');
+}
+
+function scaleMission(base, cycle){
+  if(cycle<=0) return Object.assign({}, base, {cycle:0});
+  const mult = 1 + cycle*0.5;
+  const target = Math.round(base.target*mult);
+  const reward = {};
+  if(base.reward.fuel) reward.fuel = Math.round(base.reward.fuel*(1+cycle*0.3));
+  if(base.reward.credits) reward.credits = Math.round(base.reward.credits*(1+cycle*0.3));
+  if(base.reward.xp) reward.xp = Math.round(base.reward.xp*(1+cycle*0.3));
+  if(base.reward.elements){
+    reward.elements = {};
+    Object.entries(base.reward.elements).forEach(([k,v])=>{ reward.elements[k]=Math.round(v*(1+cycle*0.3)); });
+  }
+  return Object.assign({}, base, {target, reward, cycle});
+}
+function currentMission(){
+  const idx = state.missionsCompleted % MISSION_QUEUE.length;
+  const cycle = Math.floor(state.missionsCompleted / MISSION_QUEUE.length);
+  return scaleMission(MISSION_QUEUE[idx], cycle);
+}
+function maxDefenseLevel(){
+  const levels = Object.values(state.planetState).filter(ps=>ps.owner==='player' && !ps.homeworld).map(ps=>ps.defenseLevel);
+  return levels.length ? Math.max(...levels) : 0;
+}
+function missionFraction(m){
+  switch(m.type){
+    case 'visitedCount': return clamp(state.visitedStars.length/m.target,0,1);
+    case 'coloniesCount': return clamp(countPlayerColonies()/m.target,0,1);
+    case 'credits': return clamp(state.credits/m.target,0,1);
+    case 'maxDefense': return clamp(maxDefenseLevel()/m.target,0,1);
+    case 'marketSales': return clamp((state.marketSales||0)/m.target,0,1);
+    case 'level': return clamp(state.level/m.target,0,1);
+    case 'raidsSurvived': return clamp((state.raidsSurvived||0)/m.target,0,1);
+    case 'reclaims': return clamp((state.reclaimsCount||0)/m.target,0,1);
+    default: return 0;
+  }
+}
+function missionMet(m){ return missionFraction(m) >= 1; }
+function checkMissions(){
+  const m = currentMission();
+  if(missionMet(m)){
+    applyRewardObj(m.reward);
+    state.missionsCompleted++;
+    toast(`✅ Objective complete: ${m.desc}  ${rewardText(m.reward)}`, 'ok');
+    sfxGood();
+    renderMissionPanel();
+    renderHUD();
+    persist();
+  }
+}
+
+/* ============================================================
+   TOASTS
+============================================================ */
+function toast(msg, kind){
+  const c = document.getElementById('toastContainer');
+  const t = el(`<div class="toast ${kind==='err'?'err':kind==='ok'?'ok':''}">${msg}</div>`);
+  c.appendChild(t);
+  setTimeout(()=>{ t.classList.add('fadeout'); setTimeout(()=>t.remove(),400); }, 3800);
+}
+
+/* ============================================================
+   PLANET GLYPH RENDERER
+============================================================ */
+function statusRingColor(ps){
+  if(ps.homeworld) return '#e8b64f';
+  if(ps.owner==='player') return '#e8b64f';
+  if(ps.status==='contested') return '#e0616f';
+  if(ps.visited) return '#5fd4c4';
+  return '#3d4a68';
+}
+function renderPlanetGlyph(canvas, planet, ps){
+  const dpr = window.devicePixelRatio||1;
+  const cssSize = canvas.dataset.size ? parseInt(canvas.dataset.size) : canvas.width;
+  canvas.width = cssSize*dpr; canvas.height = cssSize*dpr;
+  canvas.style.width = cssSize+'px'; canvas.style.height = cssSize+'px';
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  const W=cssSize, H=cssSize;
+  ctx.clearRect(0,0,W,H);
+  const rand = mulberry32(hashStr(planet.id));
+  const cx=W/2, cy=H/2;
+  const baseR = W*0.32;
+  const ringColor = statusRingColor(ps);
+  const rt = planet.resourceType;
+  const hueMap = {metal:18, ice:195, organics:135, crystal:280};
+  const hue = hueMap[rt];
+  const sat = 46+rand()*22;
+  const light = 40+rand()*14;
+
+  const glow = ctx.createRadialGradient(cx,cy,baseR*0.55,cx,cy,baseR*1.9);
+  glow.addColorStop(0, ringColor+'55');
+  glow.addColorStop(1, ringColor+'00');
+  ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(cx,cy,baseR*1.9,0,Math.PI*2); ctx.fill();
+
+  ctx.save();
+  ctx.beginPath();
+  if(rt==='crystal'){
+    const pts=6;
+    for(let i=0;i<=pts;i++){
+      const a=(i/pts)*Math.PI*2 + rand()*0.3;
+      const r = baseR*(0.85+ (i%2===0?0.15:-0.1));
+      const x=cx+Math.cos(a)*r, y=cy+Math.sin(a)*r;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+  }else{
+    ctx.arc(cx,cy,baseR,0,Math.PI*2);
+  }
+  ctx.clip();
+
+  const sphereGrad = ctx.createLinearGradient(cx-baseR,cy-baseR,cx+baseR,cy+baseR);
+  sphereGrad.addColorStop(0, `hsl(${hue} ${sat}% ${clamp(light+16,10,85)}%)`);
+  sphereGrad.addColorStop(1, `hsl(${(hue+26)%360} ${sat}% ${clamp(light-16,6,80)}%)`);
+  ctx.fillStyle=sphereGrad;
+  ctx.fillRect(cx-baseR*1.3,cy-baseR*1.3,baseR*2.6,baseR*2.6);
+
+  if(rt==='crystal'){
+    for(let i=0;i<5;i++){
+      const a=rand()*Math.PI*2;
+      ctx.strokeStyle=`hsla(${hue} 60% 90% / .35)`; ctx.lineWidth=1;
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.lineTo(cx+Math.cos(a)*baseR, cy+Math.sin(a)*baseR);
+      ctx.stroke();
+    }
+  }else if(rt==='organics'){
+    for(let i=0;i<7;i++){
+      const a=rand()*Math.PI*2, d=rand()*baseR*0.8;
+      ctx.fillStyle=`hsla(${hue+20} 60% 55% / .55)`;
+      ctx.beginPath(); ctx.arc(cx+Math.cos(a)*d, cy+Math.sin(a)*d, baseR*0.07,0,Math.PI*2); ctx.fill();
+    }
+  }else{
+    const craterCount = 3+Math.floor(rand()*5);
+    for(let i=0;i<craterCount;i++){
+      const a=rand()*Math.PI*2, d=rand()*baseR*0.78;
+      const rx=cx+Math.cos(a)*d, ry=cy+Math.sin(a)*d;
+      const cr = baseR*(0.06+rand()*0.11);
+      ctx.fillStyle = `hsla(${hue} ${sat}% ${clamp(light-24,5,60)}% / .5)`;
+      ctx.beginPath(); ctx.arc(rx,ry,cr,0,Math.PI*2); ctx.fill();
+    }
+    if(rt==='ice'){
+      ctx.strokeStyle='rgba(220,250,255,.5)'; ctx.lineWidth=1.1;
+      for(let i=0;i<3;i++){
+        const a=rand()*Math.PI*2;
+        ctx.beginPath();
+        ctx.moveTo(cx+Math.cos(a)*baseR*0.18, cy+Math.sin(a)*baseR*0.18);
+        ctx.lineTo(cx+Math.cos(a)*baseR*0.92, cy+Math.sin(a)*baseR*0.92);
+        ctx.stroke();
+      }
+    }
+  }
+
+  const rim = ctx.createRadialGradient(cx-baseR*0.4,cy-baseR*0.4,0,cx,cy,baseR*1.15);
+  rim.addColorStop(0,'rgba(255,255,255,.26)'); rim.addColorStop(0.6,'rgba(255,255,255,0)');
+  ctx.fillStyle=rim; ctx.fillRect(cx-baseR*1.3,cy-baseR*1.3,baseR*2.6,baseR*2.6);
+  ctx.restore();
+
+  ctx.beginPath(); ctx.arc(cx,cy,baseR+2,0,Math.PI*2);
+  ctx.strokeStyle=ringColor; ctx.lineWidth=2; ctx.stroke();
+}
+
+/* ============================================================
+   STARMAP RENDERING
+============================================================ */
+const starmapCanvas = document.getElementById('starmap');
+const smCtx = starmapCanvas.getContext('2d');
+let nodePositions = {};
+let travelAnim = null;
+const REDUCE_MOTION = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function resizeStarmap(){
+  const dpr = window.devicePixelRatio||1;
+  const w = starmapCanvas.clientWidth, h = starmapCanvas.clientHeight;
+  starmapCanvas.width = Math.max(1,w*dpr); starmapCanvas.height = Math.max(1,h*dpr);
+  smCtx.setTransform(dpr,0,0,dpr,0,0);
+  computeNodePositions();
+  drawMap(performance.now());
+}
+function computeNodePositions(){
+  const w = starmapCanvas.clientWidth, h = starmapCanvas.clientHeight;
+  const margin = 40;
+  nodePositions = {};
+  STAR_ORDER.forEach(id=>{
+    const p = STAR_POS[id];
+    nodePositions[id] = { x: margin+p.nx*(w-2*margin), y: margin+p.ny*(h-2*margin), r: id===HOME_STAR_ID?13:8 };
+  });
+}
+function starHasPlayerColony(id){ return STAR_INDEX[id].planets.some(p=>getPlanetState(p.id).owner==='player'); }
+function starHasContested(id){ return STAR_INDEX[id].planets.some(p=>getPlanetState(p.id).status==='contested'); }
+function starVisited(id){ return state.visitedStars.includes(id); }
+
+function drawMap(t){
+  const w = starmapCanvas.clientWidth, h = starmapCanvas.clientHeight;
+  smCtx.clearRect(0,0,w,h);
+
+  smCtx.strokeStyle='rgba(140,150,180,.07)'; smCtx.lineWidth=1;
+  NEIGHBOR_LINES.forEach(([a,b])=>{
+    const pa=nodePositions[a], pb=nodePositions[b];
+    if(!pa||!pb) return;
+    smCtx.beginPath(); smCtx.moveTo(pa.x,pa.y); smCtx.lineTo(pb.x,pb.y); smCtx.stroke();
+  });
+
+  if(!REDUCE_MOTION){
+    const cx=w/2, cy=h/2;
+    const angle = ((t||0)/4200) % (Math.PI*2);
+    const maxR = Math.min(w,h)/2-10;
+    smCtx.save();
+    smCtx.beginPath(); smCtx.moveTo(cx,cy);
+    smCtx.arc(cx,cy,maxR,angle,angle+0.5);
+    smCtx.closePath();
+    smCtx.fillStyle='rgba(95,212,196,.045)';
+    smCtx.fill();
+    smCtx.restore();
+  }
+
+  STAR_ORDER.forEach(id=>{
+    const p = nodePositions[id];
+    const sys = STAR_INDEX[id];
+    const visited = starVisited(id);
+    const hasColony = starHasPlayerColony(id);
+    const hasContested = starHasContested(id);
+    const isDocked = state.currentStar===id;
+
+    smCtx.beginPath();
+    smCtx.arc(p.x,p.y,p.r+(isDocked?4:0),0,Math.PI*2);
+    smCtx.fillStyle = id===HOME_STAR_ID ? '#e8b64f' : (hasColony ? '#e8b64f' : (hasContested ? '#e0616f' : (visited ? '#7fd6ff' : '#3d4a68')));
+    smCtx.fill();
+    smCtx.lineWidth = isDocked?2.5:1.4;
+    smCtx.strokeStyle = isDocked ? '#5fd4c4' : 'rgba(200,210,230,.55)';
+    smCtx.stroke();
+
+    smCtx.font='600 11px "Space Grotesk", sans-serif';
+    smCtx.fillStyle = visited ? 'rgba(233,237,246,.92)' : 'rgba(140,150,170,.55)';
+    smCtx.textAlign='center';
+    smCtx.fillText(sys.name, p.x, p.y+p.r+16);
+  });
+
+  let shipPos = nodePositions[state.currentStar];
+  if(REDUCE_MOTION && travelAnim){ travelAnim=null; }
+  if(travelAnim){
+    const now = t||performance.now();
+    const k = clamp((now-travelAnim.start)/travelAnim.dur,0,1);
+    const from = nodePositions[travelAnim.fromId], to = nodePositions[travelAnim.toId];
+    if(from && to){
+      const ease = 1-Math.pow(1-k,3);
+      shipPos = { x: from.x+(to.x-from.x)*ease, y: from.y+(to.y-from.y)*ease };
+      smCtx.strokeStyle='rgba(200,138,75,.5)'; smCtx.lineWidth=1.5; smCtx.setLineDash([4,4]);
+      smCtx.beginPath(); smCtx.moveTo(from.x,from.y); smCtx.lineTo(to.x,to.y); smCtx.stroke();
+      smCtx.setLineDash([]);
+    }
+    if(k>=1) travelAnim=null;
+  }
+  if(shipPos){
+    const pulse = REDUCE_MOTION?0:Math.sin((t||0)/300)*1.6;
+    smCtx.save();
+    smCtx.translate(shipPos.x, shipPos.y);
+    smCtx.fillStyle='#c98a4b';
+    smCtx.strokeStyle='#fff3e4'; smCtx.lineWidth=1;
+    smCtx.beginPath();
+    smCtx.moveTo(0,-9-pulse); smCtx.lineTo(7,7); smCtx.lineTo(0,3); smCtx.lineTo(-7,7);
+    smCtx.closePath(); smCtx.fill(); smCtx.stroke();
+    smCtx.restore();
+  }
+}
+
+let rafId=null;
+function mapLoop(t){
+  drawMap(t);
+  if(!REDUCE_MOTION || travelAnim){ rafId = requestAnimationFrame(mapLoop); }
+}
+function startMapLoop(){
+  cancelAnimationFrame(rafId);
+  if(REDUCE_MOTION){ drawMap(performance.now()); }
+  else { rafId = requestAnimationFrame(mapLoop); }
+}
+
+starmapCanvas.addEventListener('click', (evt)=>{
+  const rect = starmapCanvas.getBoundingClientRect();
+  const x = evt.clientX-rect.left, y = evt.clientY-rect.top;
+  let hit=null;
+  Object.entries(nodePositions).forEach(([id,p])=>{
+    if(Math.hypot(x-p.x,y-p.y) <= p.r+10) hit=id;
+  });
+  if(hit) travelTo(hit);
+});
+const mapTip = document.getElementById('mapTip');
+starmapCanvas.addEventListener('mousemove',(evt)=>{
+  const rect = starmapCanvas.getBoundingClientRect();
+  const x = evt.clientX-rect.left, y = evt.clientY-rect.top;
+  let hit=null;
+  Object.entries(nodePositions).forEach(([id,p])=>{
+    if(Math.hypot(x-p.x,y-p.y) <= p.r+10) hit=id;
+  });
+  if(hit){
+    mapTip.style.opacity=1;
+    mapTip.style.left=nodePositions[hit].x+'px';
+    mapTip.style.top=nodePositions[hit].y+'px';
+    mapTip.textContent=STAR_INDEX[hit].name;
+  }else{
+    mapTip.style.opacity=0;
+  }
+});
+starmapCanvas.addEventListener('mouseleave',()=>{ mapTip.style.opacity=0; });
+window.addEventListener('resize', debounce(resizeStarmap,150));
+
+/* ============================================================
+   ACTIONS — TRAVEL & SURVEY
+============================================================ */
+function travelTo(starId){
+  if(starId===state.currentStar) return;
+  const dist = starDistanceNorm(state.currentStar, starId);
+  const cost = clamp(Math.round(dist*45),3,40);
+  if(state.fuel < cost){
+    toast(`⛽ Not enough fuel for this flight (need ${cost}). Buy more fuel with Credits.`,'err');
+    sfxError();
+    return;
+  }
+  state.fuel -= cost;
+  sfxClick();
+  travelAnim = { fromId: state.currentStar, toId: starId, start: performance.now(), dur: 800 };
+  state.currentStar = starId;
+  startMapLoop();
+  surveyStar(starId);
+  renderHUD(); renderDock();
+  checkMissions();
+  persist();
+}
+
+function surveyStar(starId){
+  const star = STAR_INDEX[starId];
+  const isFirstVisit = !state.visitedStars.includes(starId);
+  const gained = [];
+  star.planets.forEach(p=>{
+    const ps = getPlanetState(p.id);
+    if(!ps.visited){
+      ps.visited = true;
+      const amt = Math.round(p.richness*8);
+      state.materials[p.resourceType] = (state.materials[p.resourceType]||0)+amt;
+      gained.push(`+${amt}${RESOURCE_DEFS[p.resourceType].symbol}`);
+      if(ps.status==='unclaimed' && Math.random()<0){/* no-op placeholder */}
+    }
+  });
+  if(isFirstVisit){
+    state.visitedStars.push(starId);
+    state.credits += 10;
+    gainXP(15);
+    toast(`🔭 First contact: ${star.name} surveyed! ${gained.join(' ')} · +10cr`, 'ok');
+  }else if(gained.length){
+    toast(`🔭 ${star.name} re-surveyed: ${gained.join(' ')}`, 'ok');
+  }
+}
+
+/* ============================================================
+   ACTIONS — COLONIZATION & DEFENSE
+============================================================ */
+function colonizationCost(isReclaim){
+  const owned = countPlayerColonies();
+  const mult = isReclaim ? 1.6 : 1;
+  return {
+    credits: Math.round(40*(1+0.22*owned)*mult),
+    metal: Math.round(15*(1+0.22*owned)*mult)
+  };
+}
+function colonizePlanet(planetId){
+  const p = PLANET_INDEX[planetId];
+  const ps = getPlanetState(planetId);
+  if(ps.owner==='player'){ toast('Already colonized.','err'); return; }
+  const isReclaim = ps.status==='contested';
+  const cost = colonizationCost(isReclaim);
+  if(state.credits<cost.credits || (state.materials.metal||0)<cost.metal){
+    toast(`🚧 Need ${cost.credits}cr + ${cost.metal}Fe to ${isReclaim?'reclaim':'colonize'} ${p.name}.`,'err');
+    sfxError();
+    return;
+  }
+  state.credits -= cost.credits;
+  state.materials.metal -= cost.metal;
+  ps.status='colonized'; ps.owner='player'; ps.defenseLevel=0; ps.rivalFaction=null; ps.visited=true;
+  if(isReclaim) state.reclaimsCount = (state.reclaimsCount||0)+1;
+  gainXP(25);
+  toast(`🏳️ Colony established on ${p.name}!`,'ok');
+  sfxLevelUp();
+  renderHUD(); renderDock(); drawMap(performance.now());
+  checkMissions();
+  persist();
+}
+function defenseCost(level){
+  return { credits: Math.round(20*(level+1)*1.3), metal: Math.round(10*(level+1)) };
+}
+function upgradeDefense(planetId){
+  const p = PLANET_INDEX[planetId];
+  const ps = getPlanetState(planetId);
+  if(ps.homeworld){ toast('The Homeworld is already fully defended.','err'); return; }
+  if(ps.defenseLevel>=5){ toast('Defense Grid already at maximum.','err'); return; }
+  const cost = defenseCost(ps.defenseLevel);
+  if(state.credits<cost.credits || (state.materials.metal||0)<cost.metal){
+    toast(`🚧 Need ${cost.credits}cr + ${cost.metal}Fe to upgrade defenses on ${p.name}.`,'err');
+    sfxError();
+    return;
+  }
+  state.credits -= cost.credits;
+  state.materials.metal -= cost.metal;
+  ps.defenseLevel++;
+  toast(`🛡️ Defense Grid upgraded to level ${ps.defenseLevel} on ${p.name}.`,'ok');
+  sfxGood();
+  renderHUD(); renderDock();
+  checkMissions();
+  persist();
+}
+
+/* ============================================================
+   ACTIONS — MARKET
+============================================================ */
+function buyFuel(amount){
+  const cost = Math.round(FUEL_BUY_RATE*amount);
+  if(state.credits<cost){ toast('Not enough Credits.','err'); sfxError(); return; }
+  if(state.fuel>=state.fuelMax){ toast('Fuel tank already full.','err'); return; }
+  state.credits -= cost;
+  state.fuel = Math.min(state.fuelMax, state.fuel+amount);
+  toast(`⛽ Purchased ${amount} Fuel for ${cost} Credits.`,'ok');
+  sfxGood();
+  renderHUD(); renderMarketModal(); persist();
+}
+function buyMaterial(type, amount){
+  const cost = Math.round(MARKET_RATES[type].buy*amount);
+  if(state.credits<cost){ toast('Not enough Credits.','err'); sfxError(); return; }
+  state.credits -= cost;
+  state.materials[type] = (state.materials[type]||0)+amount;
+  toast(`Purchased ${amount} ${RESOURCE_DEFS[type].name} for ${cost} Credits.`,'ok');
+  sfxGood();
+  renderHUD(); renderMarketModal(); persist();
+}
+function sellMaterial(type, amount){
+  if((state.materials[type]||0) < amount){ toast(`Not enough ${RESOURCE_DEFS[type].name} to sell.`,'err'); sfxError(); return; }
+  const gain = Math.round(MARKET_RATES[type].sell*amount);
+  state.materials[type] -= amount;
+  state.credits += gain;
+  state.marketSales = (state.marketSales||0)+1;
+  toast(`Sold ${amount} ${RESOURCE_DEFS[type].name} for ${gain} Credits.`,'ok');
+  sfxGood();
+  renderHUD(); renderMarketModal();
+  checkMissions();
+  persist();
+}
+
+/* ============================================================
+   TICKS — PRODUCTION, RAIDS, RIVAL CLAIMS, FUEL REGEN
+============================================================ */
+function productionTick(){
+  let changed=false;
+  Object.entries(state.planetState).forEach(([id,ps])=>{
+    if(ps.owner==='player'){
+      const planet = PLANET_INDEX[id];
+      const amt = Math.max(1, Math.round(planet.richness*3));
+      state.materials[planet.resourceType] = (state.materials[planet.resourceType]||0)+amt;
+      state.credits += 1;
+      changed=true;
+    }
+  });
+  if(changed){ renderHUD(); checkMissions(); persist(); }
+}
+function raidTick(){
+  const targets = Object.entries(state.planetState).filter(([id,ps])=>ps.owner==='player' && !ps.homeworld);
+  if(!targets.length) return;
+  const weights = targets.map(([id,ps])=> 1/(ps.defenseLevel+1));
+  const totalW = weights.reduce((a,b)=>a+b,0);
+  let r = Math.random()*totalW, idx=0;
+  for(;idx<weights.length;idx++){ r-=weights[idx]; if(r<=0) break; }
+  const [pid, ps] = targets[Math.min(idx,targets.length-1)];
+  const planet = PLANET_INDEX[pid];
+  const raidChance = Math.max(0.05, 0.40 - ps.defenseLevel*0.07 - state.level*0.005);
+  const faction = FACTIONS[Math.floor(Math.random()*FACTIONS.length)];
+  if(Math.random()<raidChance){
+    ps.status='contested'; ps.owner=null; ps.rivalFaction=faction; ps.defenseLevel=0;
+    toast(`⚠️ ${faction} raided your colony on ${planet.name} — it has fallen!`,'err');
+    sfxRaidLoss();
+  }else{
+    state.credits += 5;
+    state.raidsSurvived = (state.raidsSurvived||0)+1;
+    toast(`🛡️ Your colony on ${planet.name} repelled a raid by ${faction}! (+5cr)`,'ok');
+    sfxGood();
+  }
+  renderHUD(); renderDock(); drawMap(performance.now());
+  checkMissions();
+  persist();
+}
+function rivalClaimTick(){
+  let any=false;
+  Object.entries(state.planetState).forEach(([id,ps])=>{
+    if(ps.visited && ps.status==='unclaimed' && Math.random()<0.03){
+      const planet = PLANET_INDEX[id];
+      const faction = FACTIONS[Math.floor(Math.random()*FACTIONS.length)];
+      ps.status='contested'; ps.rivalFaction=faction;
+      toast(`🚩 ${faction} claimed ${planet.name} before you could colonize it.`,'err');
+      any=true;
+    }
+  });
+  if(any){ renderDock(); drawMap(performance.now()); persist(); }
+}
+
+let fuelRegenTimer=null, productionTimer=null, raidTimer=null, rivalTimer=null, missionCheckTimer=null;
+function startTimers(){
+  clearInterval(fuelRegenTimer);
+  fuelRegenTimer = setInterval(()=>{
+    if(state.fuel < state.fuelMax){
+      state.fuel = Math.min(state.fuelMax, state.fuel+1);
+      document.getElementById('fuelBar').style.width = clamp((state.fuel/state.fuelMax)*100,0,100)+'%';
+      document.getElementById('fuelLabel').textContent = `${Math.floor(state.fuel)} / ${state.fuelMax}`;
+      persist();
+    }
+  }, 20000);
+  clearInterval(productionTimer); productionTimer = setInterval(productionTick, 10000);
+  clearInterval(raidTimer); raidTimer = setInterval(raidTick, 25000);
+  clearInterval(rivalTimer); rivalTimer = setInterval(rivalClaimTick, 40000);
+  clearInterval(missionCheckTimer); missionCheckTimer = setInterval(checkMissions, 4000);
+}
+
+/* ============================================================
+   RENDER — HUD
+============================================================ */
+function renderHUD(){
+  document.getElementById('rankName').textContent = rankName(state.level);
+  document.getElementById('lvlLabel').textContent = 'Lv. '+state.level;
+  document.getElementById('xpBar').style.width = clamp((state.xp/xpToNext(state.level))*100,0,100)+'%';
+  document.getElementById('xpLabel').textContent = `${state.xp} / ${xpToNext(state.level)} XP`;
+  document.getElementById('fuelBar').style.width = clamp((state.fuel/state.fuelMax)*100,0,100)+'%';
+  document.getElementById('fuelLabel').textContent = `${Math.floor(state.fuel)} / ${state.fuelMax}`;
+  document.getElementById('creditsValue').textContent = Math.floor(state.credits);
+  const totalSurveyed = Object.values(state.planetState).filter(ps=>ps.visited).length;
+  document.getElementById('atlasCount').textContent = `${totalSurveyed}/${TOTAL_PLANETS}`;
+  document.getElementById('buyFuelBtn').disabled = state.fuel>=state.fuelMax || state.credits < Math.round(FUEL_BUY_RATE*10);
+  renderElementGrid();
+  renderColoniesSummary();
+}
+function renderElementGrid(){
+  const g = document.getElementById('elementGrid');
+  g.innerHTML='';
+  RESOURCE_IDS.forEach(id=>{
+    const def = RESOURCE_DEFS[id];
+    const chip = el(`<div class="el-chip" title="${def.name}">
+      <span class="el-dot" style="background:${def.color};color:${def.color}"></span>
+      <span class="el-sym">${def.symbol}</span>
+      <span class="el-amt">${Math.floor(state.materials[id]||0)}</span>
+    </div>`);
+    g.appendChild(chip);
+  });
+}
+function renderColoniesSummary(){
+  const owned = countPlayerColonies();
+  const contested = Object.values(state.planetState).filter(ps=>ps.status==='contested').length;
+  const est = owned*1 + 1; // rough credits/tick estimate incl. homeworld
+  document.getElementById('coloniesSummary').innerHTML = `
+    <span><b>${owned}</b> active colonies</span>
+    <span><b>${contested}</b> rival-held planets nearby</span>
+    <span>~<b>${est}</b>cr / 10s trade income</span>
+  `;
+}
+
+function renderMissionPanel(){
+  const m = currentMission();
+  document.getElementById('missionDesc').textContent = m.desc;
+  document.getElementById('missionBar').style.width = (missionFraction(m)*100)+'%';
+  document.getElementById('missionCycleTag').textContent = m.cycle ? `cycle ${m.cycle+1}` : '';
+}
+
+/* ============================================================
+   RENDER — DOCK PANEL
+============================================================ */
+function planetActionHtml(p, ps){
+  if(ps.homeworld){
+    return `<span class="def-tag">🛡️ Secure</span>`;
+  }
+  if(ps.owner==='player'){
+    if(ps.defenseLevel>=5){
+      return `<span class="def-tag">Defense Lv.${ps.defenseLevel} (max)</span>`;
+    }
+    const c = defenseCost(ps.defenseLevel);
+    return `<span class="def-tag">Defense Lv.${ps.defenseLevel}</span>
+      <button class="btn btn-brass btn-sm" data-action="defend" data-planet="${p.id}">Upgrade (${c.credits}cr, ${c.metal}Fe)</button>`;
+  }
+  if(ps.status==='contested'){
+    const c = colonizationCost(true);
+    return `<button class="btn btn-primary btn-sm" data-action="colonize" data-planet="${p.id}">Reclaim (${c.credits}cr, ${c.metal}Fe)</button>`;
+  }
+  const c = colonizationCost(false);
+  return `<button class="btn btn-primary btn-sm" data-action="colonize" data-planet="${p.id}">Colonize (${c.credits}cr, ${c.metal}Fe)</button>`;
+}
+function planetStatusHtml(ps){
+  if(ps.homeworld) return `<span class="planet-status st-homeworld">Homeworld</span>`;
+  if(ps.owner==='player') return `<span class="planet-status st-owned">Colonized</span>`;
+  if(ps.status==='contested') return `<span class="planet-status st-contested">Contested — held by ${ps.rivalFaction||'rivals'}</span>`;
+  return `<span class="planet-status st-available">Surveyed — available</span>`;
+}
+function richDots(richness){
+  const n = clamp(Math.round(richness*2.5),1,5);
+  return '●'.repeat(n)+'○'.repeat(5-n);
+}
+function renderDock(){
+  const star = STAR_INDEX[state.currentStar];
+  document.getElementById('dockSystemName').textContent = star.name;
+  document.getElementById('dockSystemDesc').textContent = star.desc;
+  const owned = star.planets.filter(p=>getPlanetState(p.id).owner==='player').length;
+  document.getElementById('dockCompletion').textContent = `${owned} / ${star.planets.length} colonized`;
+
+  const list = document.getElementById('dockPlanetsList');
+  list.innerHTML='';
+  star.planets.forEach(p=>{
+    const ps = getPlanetState(p.id);
+    const card = el(`<div class="planet-card">
+      <div class="glyph-wrap"><canvas class="glyph-canvas" data-size="56" width="56" height="56"></canvas></div>
+      <div class="planet-info">
+        <div class="planet-name">${p.name}</div>
+        <div class="planet-meta">${p.flavor} · ${RESOURCE_DEFS[p.resourceType].symbol} richness ${richDots(p.richness)}</div>
+        ${planetStatusHtml(ps)}
+      </div>
+      <div class="planet-actions">${planetActionHtml(p, ps)}</div>
+    </div>`);
+    list.appendChild(card);
+    renderPlanetGlyph(card.querySelector('canvas'), p, ps);
+  });
+}
+document.getElementById('dockPlanetsList').addEventListener('click',(e)=>{
+  const btn = e.target.closest('button[data-action]');
+  if(!btn) return;
+  const planetId = btn.dataset.planet;
+  if(btn.dataset.action==='colonize') colonizePlanet(planetId);
+  else if(btn.dataset.action==='defend') upgradeDefense(planetId);
+});
+
+/* ============================================================
+   RENDER — STAR ATLAS MODAL
+============================================================ */
+let atlasFilter='all';
+function renderAtlasModal(){
+  const totalSurveyed = Object.values(state.planetState).filter(ps=>ps.visited).length;
+  document.getElementById('atlasSub').textContent = `${totalSurveyed} / ${TOTAL_PLANETS} planets surveyed`;
+
+  const filterRow = document.getElementById('filterRow');
+  const filters = [['all','All'],['visited','Surveyed'],['owned','Colonized'],['contested','Contested'],['unvisited','Unvisited']];
+  filterRow.innerHTML = filters.map(([id,name])=>`<button class="filter-chip ${atlasFilter===id?'active':''}" data-f="${id}">${name}</button>`).join('');
+  filterRow.querySelectorAll('.filter-chip').forEach(btn=>{
+    btn.addEventListener('click',()=>{ atlasFilter=btn.dataset.f; renderAtlasModal(); });
+  });
+
+  const body = document.getElementById('atlasBody');
+  body.innerHTML='';
+  STAR_ORDER.forEach(starId=>{
+    const star = STAR_INDEX[starId];
+    let planets = star.planets;
+    planets = planets.filter(p=>{
+      const ps = getPlanetState(p.id);
+      if(atlasFilter==='visited') return ps.visited;
+      if(atlasFilter==='owned') return ps.owner==='player';
+      if(atlasFilter==='contested') return ps.status==='contested';
+      if(atlasFilter==='unvisited') return !ps.visited;
+      return true;
+    });
+    if(!planets.length) return;
+
+    const ownedN = star.planets.filter(p=>getPlanetState(p.id).owner==='player').length;
+    const group = el(`<div class="sys-group">
+      <div class="sys-group-title"><span>${star.name}</span><span>${ownedN}/${star.planets.length} colonized</span></div>
+      <div class="card-grid"></div>
+    </div>`);
+    const grid = group.querySelector('.card-grid');
+    planets.forEach(p=>{
+      const ps = getPlanetState(p.id);
+      if(!ps.visited){
+        grid.appendChild(el(`<div class="obj-card locked">
+          <div class="locked-icon">?</div>
+          <div class="name">Unsurveyed</div>
+          <div class="count">${p.name}</div>
+        </div>`));
+      }else{
+        const card = el(`<div class="obj-card">
+          <div class="glyph-wrap"><canvas class="glyph-canvas" data-size="64" width="64" height="64"></canvas></div>
+          <div class="name">${p.name}</div>
+          ${planetStatusHtml(ps)}
+        </div>`);
+        grid.appendChild(card);
+        renderPlanetGlyph(card.querySelector('canvas'), p, ps);
+      }
+    });
+    body.appendChild(group);
+  });
+}
+
+/* ============================================================
+   RENDER — MARKET MODAL
+============================================================ */
+function renderMarketModal(){
+  const body = document.getElementById('marketBody');
+  body.innerHTML='';
+  const fuelRow = el(`<div class="market-row">
+    <div class="market-info">
+      <div class="market-name">⛽ Fuel</div>
+      <div class="market-stock">In tank: ${Math.floor(state.fuel)} / ${state.fuelMax}</div>
+    </div>
+    <div class="market-actions">
+      <button class="btn btn-primary btn-sm" data-buy="fuel" data-amt="10">Buy +10 (${Math.round(FUEL_BUY_RATE*10)}cr)</button>
+      <button class="btn btn-primary btn-sm" data-buy="fuel" data-amt="50">Buy +50 (${Math.round(FUEL_BUY_RATE*50)}cr)</button>
+    </div>
+  </div>`);
+  body.appendChild(fuelRow);
+
+  RESOURCE_IDS.forEach(id=>{
+    const def = RESOURCE_DEFS[id];
+    const rate = MARKET_RATES[id];
+    const row = el(`<div class="market-row">
+      <div class="market-info">
+        <div class="market-name">${def.symbol} ${def.name}</div>
+        <div class="market-stock">Stock: ${Math.floor(state.materials[id]||0)} · buy ${rate.buy}cr / sell ${rate.sell}cr per unit</div>
+      </div>
+      <div class="market-actions">
+        <button class="btn btn-primary btn-sm" data-buy="${id}" data-amt="10">Buy +10 (${Math.round(rate.buy*10)}cr)</button>
+        <button class="btn btn-brass btn-sm" data-sell="${id}" data-amt="10">Sell −10 (+${Math.round(rate.sell*10)}cr)</button>
+      </div>
+    </div>`);
+    body.appendChild(row);
+  });
+}
+document.getElementById('marketBody')?.addEventListener('click', ()=>{});
+document.getElementById('marketModal').addEventListener('click',(e)=>{
+  const buyBtn = e.target.closest('button[data-buy]');
+  const sellBtn = e.target.closest('button[data-sell]');
+  if(buyBtn){
+    const type = buyBtn.dataset.buy, amt = parseInt(buyBtn.dataset.amt);
+    if(type==='fuel') buyFuel(amt); else buyMaterial(type, amt);
+  }else if(sellBtn){
+    const type = sellBtn.dataset.sell, amt = parseInt(sellBtn.dataset.amt);
+    sellMaterial(type, amt);
+  }
+});
+
+/* ============================================================
+   MODAL WIRING
+============================================================ */
+function openModal(id){ document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
+
+document.getElementById('atlasBtn').addEventListener('click', ()=>{ renderAtlasModal(); openModal('atlasModal'); });
+document.getElementById('atlasModalClose').addEventListener('click', ()=>closeModal('atlasModal'));
+document.getElementById('atlasModal').addEventListener('click', (e)=>{ if(e.target.id==='atlasModal') closeModal('atlasModal'); });
+
+document.getElementById('marketBtn').addEventListener('click', ()=>{ renderMarketModal(); openModal('marketModal'); });
+document.getElementById('marketModalClose').addEventListener('click', ()=>closeModal('marketModal'));
+document.getElementById('marketModal').addEventListener('click', (e)=>{ if(e.target.id==='marketModal') closeModal('marketModal'); });
+
+document.getElementById('helpBtn').addEventListener('click', ()=>openModal('helpModal'));
+document.getElementById('helpModalClose').addEventListener('click', ()=>closeModal('helpModal'));
+document.getElementById('helpCloseBtn').addEventListener('click', ()=>{ closeModal('helpModal'); state.seenIntro=true; persist(); });
+document.getElementById('helpModal').addEventListener('click', (e)=>{ if(e.target.id==='helpModal'){ closeModal('helpModal'); state.seenIntro=true; persist(); } });
+
+document.getElementById('buyFuelBtn').addEventListener('click', ()=>buyFuel(10));
+
+document.getElementById('muteBtn').addEventListener('click', ()=>{
+  state.muted = !state.muted;
+  document.getElementById('muteBtn').textContent = state.muted ? '🔇' : '🔊';
+  persist();
+});
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  if(!confirm('Reset all Captain progress? This cannot be undone.')) return;
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+  state = defaultState();
+  renderAll();
+  toast('Progress reset. New expedition launched.','ok');
+});
+
+document.addEventListener('keydown',(e)=>{
+  if(e.key==='Escape'){ closeModal('atlasModal'); closeModal('marketModal'); closeModal('helpModal'); closeModal('walletModal'); }
+});
+
+/* ============================================================
+   ON-CHAIN WALLET — Cronos (read-only)
+============================================================ */
+const CRONOS_CHAIN_ID_DEC = 25;
+const CRONOS_CHAIN_ID_HEX = '0x19';
+const CRONOS_CHAIN_PARAMS = {
+  chainId: CRONOS_CHAIN_ID_HEX,
+  chainName: 'Cronos Mainnet',
+  nativeCurrency: { name:'Cronos', symbol:'CRO', decimals:18 },
+  rpcUrls: ['https://evm.cronos.org'],
+  blockExplorerUrls: ['https://cronoscan.com']
+};
+const MARVEL_CONTRACT_ADDR = '0xf37A3686800A9fb19625c05e1A7ACf2D232e8aa4'; // Milky Way Marvels NFT (ERC-721)
+const RAVERSE_CONTRACT_ADDR = '0xD504aB14f8A0EEF1C2044B312aA645E027787E97'; // RaVerse / The Rainbowland Metaverse (CRC-20)
+const ERC721_MIN_ABI = [
+  'function balanceOf(address owner) view returns (uint256)',
+  'function tokenOfOwnerByIndex(address owner, uint256 index) view returns (uint256)',
+  'function tokenURI(uint256 tokenId) view returns (string)'
+];
+const ERC20_MIN_ABI = [
+  'function balanceOf(address owner) view returns (uint256)',
+  'function decimals() view returns (uint8)'
+];
+
+function shortAddr(a){ return a ? a.slice(0,6)+'…'+a.slice(-4) : ''; }
+
+function ethersReady(){
+  if(typeof window.ethers === 'undefined'){
+    toast('Wallet library did not load — check your connection and try again.','err');
+    return false;
+  }
+  return true;
+}
+
+async function ensureCronosNetwork(){
+  const net = await window.ethereum.request({ method:'eth_chainId' });
+  if(net === CRONOS_CHAIN_ID_HEX) return true;
+  try{
+    await window.ethereum.request({ method:'wallet_switchEthereumChain', params:[{chainId:CRONOS_CHAIN_ID_HEX}] });
+    return true;
+  }catch(switchErr){
+    if(switchErr && switchErr.code===4902){
+      try{
+        await window.ethereum.request({ method:'wallet_addEthereumChain', params:[CRONOS_CHAIN_PARAMS] });
+        return true;
+      }catch(addErr){ return false; }
+    }
+    return false;
+  }
+}
+
+async function connectWallet(){
+  if(typeof window.ethereum === 'undefined'){
+    toast('No EVM wallet extension found. Install MetaMask or Crypto.com DeFi Wallet.','err');
+    return;
+  }
+  if(!ethersReady()) return;
+  try{
+    await window.ethereum.request({ method:'eth_requestAccounts' });
+    const switched = await ensureCronosNetwork();
+    if(!switched){ toast('Please switch your wallet to Cronos Mainnet (chain ID 25) to continue.','err'); return; }
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const address = await signer.getAddress();
+    state.walletAddress = address;
+    toast(`🔗 Wallet connected: ${shortAddr(address)}`,'ok');
+    sfxGood();
+    renderWalletUI();
+    persist();
+    await refreshWalletHoldings();
+  }catch(e){
+    console.error(e);
+    toast('Wallet connection was rejected or failed.','err');
+  }
+}
+
+async function refreshWalletHoldings(){
+  if(!state.walletAddress || !ethersReady()) return;
+  try{
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const marvel = new ethers.Contract(MARVEL_CONTRACT_ADDR, ERC721_MIN_ABI, provider);
+    const raverse = new ethers.Contract(RAVERSE_CONTRACT_ADDR, ERC20_MIN_ABI, provider);
+
+    const [marvelBal, raverseBalRaw] = await Promise.all([
+      marvel.balanceOf(state.walletAddress).catch(()=>0n),
+      raverse.balanceOf(state.walletAddress).catch(()=>0n)
+    ]);
+    state.marvelCount = Number(marvelBal);
+    state.raverseBalance = Number(ethers.formatUnits(raverseBalRaw, 18));
+
+    state.marvelTokens = [];
+    if(state.marvelCount>0 && state.marvelCount<=50){
+      for(let i=0;i<state.marvelCount;i++){
+        try{
+          const tokenId = await marvel.tokenOfOwnerByIndex(state.walletAddress, i);
+          state.marvelTokens.push(tokenId.toString());
+        }catch(e){ break; } // contract may not implement ERC721Enumerable — balance count is still valid
+      }
+    }
+    maybeGrantWalletBonus();
+    renderWalletUI();
+    if(!document.getElementById('walletModal').classList.contains('hidden')) renderWalletModal();
+    persist();
+  }catch(e){
+    console.error('holdings check failed', e);
+    toast('Could not read on-chain holdings right now.','err');
+  }
+}
+
+function maybeGrantWalletBonus(){
+  if(state.walletBonusClaimedFor === state.walletAddress) return;
+  if(state.marvelCount<=0 && state.raverseBalance<=0) return;
+  const marvelBonus = Math.min(150, state.marvelCount*30);
+  const raverseBonus = Math.min(300, Math.floor(state.raverseBalance/10));
+  const totalCredits = marvelBonus + raverseBonus;
+  if(totalCredits>0){
+    state.credits += totalCredits;
+    state.walletBonusClaimedFor = state.walletAddress;
+    toast(`🎖️ Founder bonus: +${totalCredits} Credits for your real Milky Way Marvels / RaVerse holdings!`,'ok');
+    sfxLevelUp();
+    renderHUD();
+    persist();
+  }
+}
+
+function renderWalletUI(){
+  const btn = document.getElementById('walletBtn');
+  btn.textContent = state.walletAddress ? `🔗 ${shortAddr(state.walletAddress)}` : '🔗 Connect Wallet';
+}
+
+function renderWalletModal(){
+  const body = document.getElementById('walletBody');
+  if(!state.walletAddress){
+    body.innerHTML = `
+      <p style="font-size:13px;color:var(--text-dim);line-height:1.6;">
+        Connect an EVM wallet (MetaMask, Crypto.com DeFi Wallet, or similar) on <strong>Cronos Mainnet</strong>
+        to check whether it holds real <strong>Milky Way Marvels</strong> NFTs or <strong>RaVerse</strong> tokens.
+        Verified holders get a one-time Founder's Credit bonus. This is read-only — no transaction is ever requested.
+      </p>
+      <button class="btn btn-primary" id="walletModalConnectBtn" style="margin-top:8px;">🔗 Connect Wallet</button>
+    `;
+    document.getElementById('walletModalConnectBtn').addEventListener('click', connectWallet);
+    return;
+  }
+  const holderBadge = (state.marvelCount>0 || state.raverseBalance>0)
+    ? `<span class="planet-status st-owned">Verified Holder</span>`
+    : `<span class="planet-status st-available">No holdings found on this wallet</span>`;
+  body.innerHTML = `
+    <div class="market-row">
+      <div class="market-info">
+        <div class="market-name">Connected Address</div>
+        <div class="market-stock" style="font-family:var(--font-mono);">${state.walletAddress}</div>
+      </div>
+      ${holderBadge}
+    </div>
+    <div class="market-row">
+      <div class="market-info">
+        <div class="market-name">🪐 Milky Way Marvels NFTs</div>
+        <div class="market-stock">${state.marvelCount} owned${state.marvelTokens.length ? ' · IDs: '+state.marvelTokens.slice(0,12).join(', ')+(state.marvelTokens.length>12?'…':'') : ''}</div>
+      </div>
+    </div>
+    <div class="market-row">
+      <div class="market-info">
+        <div class="market-name">💧 RaVerse Balance</div>
+        <div class="market-stock">${state.raverseBalance.toLocaleString(undefined,{maximumFractionDigits:2})} RaVerse</div>
+      </div>
+    </div>
+    <div class="market-row">
+      <div class="market-info">
+        <div class="market-name">Founder Bonus</div>
+        <div class="market-stock">${state.walletBonusClaimedFor===state.walletAddress ? 'Already claimed for this wallet' : 'Not yet claimed'}</div>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-sm" id="walletRefreshBtn" style="margin-top:8px;">↻ Refresh Holdings</button>
+  `;
+  document.getElementById('walletRefreshBtn').addEventListener('click', refreshWalletHoldings);
+}
+
+document.getElementById('walletBtn').addEventListener('click', ()=>{
+  renderWalletModal();
+  openModal('walletModal');
+});
+document.getElementById('walletModalClose').addEventListener('click', ()=>closeModal('walletModal'));
+document.getElementById('walletModal').addEventListener('click', (e)=>{ if(e.target.id==='walletModal') closeModal('walletModal'); });
+
+if(typeof window.ethereum !== 'undefined'){
+  window.ethereum.on && window.ethereum.on('accountsChanged', (accts)=>{
+    state.walletAddress = accts && accts.length ? accts[0] : null;
+    renderWalletUI();
+    if(state.walletAddress) refreshWalletHoldings(); else persist();
+  });
+  window.ethereum.on && window.ethereum.on('chainChanged', ()=>{
+    if(state.walletAddress) refreshWalletHoldings();
+  });
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+function renderAll(){
+  renderHUD();
+  renderMissionPanel();
+  renderDock();
+  renderWalletUI();
+  document.getElementById('muteBtn').textContent = state.muted ? '🔇' : '🔊';
+  resizeStarmap();
+  startMapLoop();
+}
+
+async function trySilentWalletRestore(){
+  if(typeof window.ethereum === 'undefined') return;
+  try{
+    const accts = await window.ethereum.request({ method:'eth_accounts' }); // no popup — only already-approved accounts
+    if(accts && accts.length){
+      state.walletAddress = accts[0];
+      renderWalletUI();
+      await refreshWalletHoldings();
+    }
+  }catch(e){ /* ignore — wallet just won't auto-reconnect */ }
+}
+
+(async function init(){
+  const saved = await loadGame();
+  if(saved){
+    state = Object.assign(defaultState(), saved);
+    RESOURCE_IDS.forEach(id=>{ if(typeof state.materials[id] !== 'number') state.materials[id]=0; });
+    if(!state.planetState[HOME_PLANET_ID]){
+      state.planetState[HOME_PLANET_ID] = {visited:true, status:'colonized', owner:'player', defenseLevel:99, homeworld:true, rivalFaction:null};
+    }
+  }
+  renderAll();
+  startTimers();
+  if(!state.seenIntro){ openModal('helpModal'); }
+  trySilentWalletRestore();
+})();
+
+})();
+</script>
+</body>
+</html>
